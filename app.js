@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const routes = require("./routes");
-const rateLimiter = require("./utils/rateLimiter");
 const helmet = require("helmet");
+const routes = require("./routes");
+const { rateLimiter } = require("./utils/rateLimiter");
 
 const { PORT = 3001 } = process.env;
 const app = express();

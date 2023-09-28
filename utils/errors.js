@@ -18,6 +18,7 @@ const handleErrors = (err, res) => {
       break;
     case "RateLimitError":
       res.status(TOO_MANY_REQUESTS).send({ message: err.message });
+      break;
     default:
       res
         .status(INTERNAL_SERVER_ERROR)
