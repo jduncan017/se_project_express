@@ -13,7 +13,7 @@ const createUser = (req, res) => {
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.send(users))
     .catch((err) => handleErrors(err, res));
 };
 
@@ -23,7 +23,7 @@ const getUser = (req, res) => {
   User.findById(userId)
     .orFail()
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => handleErrors(err, res));
 };

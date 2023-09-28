@@ -14,19 +14,7 @@ const createItem = (req, res) => {
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
-    .catch((err) => handleErrors(err, res));
-};
-
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } }, { new: true })
-    .orFail()
-    .then((item) => {
-      res.status(200).send({ data: item, message: "Update Successful!" });
-    })
+    .then((items) => res.send(items))
     .catch((err) => handleErrors(err, res));
 };
 
@@ -36,7 +24,7 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => {
-      res.status(200).send({ message: "Item Deleted", data: item });
+      res.send({ message: "Item Deleted", data: item });
     })
     .catch((err) => handleErrors(err, res));
 };
@@ -48,9 +36,7 @@ const likeItem = (req, res) =>
     { new: true },
   )
     .orFail()
-    .then((like) =>
-      res.status(200).send({ message: `Item ${req.params.itemId} liked` }),
-    )
+    .then(() => res.send({ message: `Item ${req.params.itemId} liked` }))
     .catch((err) => handleErrors(err, res));
 
 const dislikeItem = (req, res) =>
@@ -60,15 +46,12 @@ const dislikeItem = (req, res) =>
     { new: true },
   )
     .orFail()
-    .then((like) =>
-      res.status(200).send({ message: `Item ${req.params.itemId} disliked` }),
-    )
+    .then(() => res.send({ message: `Item ${req.params.itemId} disliked` }))
     .catch((err) => handleErrors(err, res));
 
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   dislikeItem,

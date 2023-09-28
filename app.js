@@ -1,5 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const routes = require("./routes");
+const rateLimiter = require("./utils/rateLimiter");
+const helmet = require("helmet");
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
@@ -8,8 +12,9 @@ mongoose
   .then(() => console.log("Database connected"))
   .catch((err) => console.log("Error connecting to database: ", err));
 
-const routes = require("./routes");
 app.use(express.json());
+app.use(rateLimiter);
+app.use(helmet());
 app.use((req, res, next) => {
   req.user = {
     _id: "651506c9c739984f38c9628b",
