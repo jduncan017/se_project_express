@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const helmet = require("helmet");
 const routes = require("./routes");
 const { rateLimiter } = require("./utils/rateLimiter");
+const { login, createUser } = require("./controllers/userController");
+const cors = require("cors");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -13,14 +15,12 @@ mongoose
   .catch((err) => console.log("Error connecting to database: ", err));
 
 app.use(express.json());
+app.use(cors());
 app.use(rateLimiter);
 app.use(helmet());
-app.use((req, res, next) => {
-  req.user = {
-    _id: "651506c9c739984f38c9628b",
-  };
-  next();
-});
+
+app.post("/signin", login);
+app.post("/signup", createUser);
 app.use(routes);
 
 app.listen(PORT, () => {

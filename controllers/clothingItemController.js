@@ -1,5 +1,5 @@
 const ClothingItem = require("../models/clothingItemModel");
-const { handleErrors } = require("../utils/errors");
+const { handleErrors, USER_PERMISSION } = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -20,9 +20,18 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const userId = req.user._id;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
+    .then((item) => {
+      console.log(`${String(item.owner)}`, userId);
+      if (String(item.owner) === String(userId)) {
+        return ClothingItem.findByIdAndDelete(itemId);
+      } else {
+        return Promise.reject(new Error(USER_PERMISSION));
+      }
+    })
     .then((item) => {
       res.send({ message: "Item Deleted", data: item });
     })
