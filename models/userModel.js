@@ -34,10 +34,9 @@ const user = new Schema({
     type: String,
     required: true,
     select: false,
-    minlength: 8,
     validate: {
       validator(value) {
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/;
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/;
         return regex.test(value);
       },
       message:
@@ -52,17 +51,17 @@ user.statics.findUserByCredentials = function findUserByCredentials(
 ) {
   return this.findOne({ email })
     .select("+password")
-    .then((user) => {
-      if (!user) {
+    .then((userProfile) => {
+      if (!userProfile) {
         return Promise.reject(new Error("Incorrect email or password"));
       }
 
-      return bcrypt.compare(password, user.password).then((matched) => {
+      return bcrypt.compare(password, userProfile.password).then((matched) => {
         if (!matched) {
           return Promise.reject(new Error("Incorrect email or password"));
         }
 
-        return user;
+        return userProfile;
       });
     });
 };

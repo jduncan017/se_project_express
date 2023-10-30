@@ -1,26 +1,14 @@
-const User = require("../models/userModel");
-const {
-  handleErrors,
-  USER_NOT_FOUND,
-  EMAIL_EXISTS,
-  INCORRECT_CREDENTIALS,
-} = require("../utils/errors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
+const User = require("../models/userModel");
+const { handleErrors } = require("../utils/errors");
 
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
-  console.log(req.body);
-
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return handleErrors(new Error(EMAIL_EXISTS), res);
-  }
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  User.create({ name, avatar, email, password: hashedPassword })
+  return User.create({ name, avatar, email, password: hashedPassword })
     .then((user) => {
       const userObj = user.toObject();
       delete userObj.password;
@@ -28,9 +16,9 @@ const createUser = async (req, res) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return handleErrors(new Error(EMAIL_EXISTS), res);
+        return handleErrors("EMAIL_EXISTS", res);
       }
-      handleErrors(err, res);
+      return handleErrors(err, res);
     });
 };
 
@@ -61,8 +49,8 @@ const login = (req, res) => {
       });
       res.send({ token });
     })
-    .catch((err) => {
-      handleErrors(new Error(INCORRECT_CREDENTIALS), res);
+    .catch(() => {
+      handleErrors("INCORRECT_CREDENTIALS", res);
     });
 };
 
@@ -70,9 +58,9 @@ const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return handleErrors(new Error(USER_NOT_FOUND), res);
+        return handleErrors("USER_NOT_FOUND", res);
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch((err) => {
       handleErrors(err, res);
@@ -81,14 +69,18 @@ const getCurrentUser = (req, res) => {
 
 const updateProfile = (req, res) => {
   const userId = req.user._id;
-  const updates = req.body;
+  const { name, avatar, email } = req.body;
 
-  User.findByIdAndUpdate(userId, updates, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    userId,
+    { name, avatar, email },
+    { new: true, runValidators: true },
+  )
     .then((updatedUser) => {
       if (!updatedUser) {
-        return handleErrors(new Error("User not found"), res);
+        return handleErrors("USER_NOT_FOUND", res);
       }
-      res.send(updatedUser);
+      return res.send(updatedUser);
     })
     .catch((err) => {
       handleErrors(err, res);
