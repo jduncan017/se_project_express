@@ -8,7 +8,14 @@ const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  return User.create({ name, avatar, email, password: hashedPassword })
+  const userData = {
+    name,
+    email,
+    password: hashedPassword,
+    avatar: avatar || undefined,
+  };
+
+  return User.create(userData)
     .then((user) => {
       const userObj = user.toObject();
       delete userObj.password;
