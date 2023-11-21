@@ -41,15 +41,19 @@ const deleteItem = (req, res) => {
     });
 };
 
-const likeItem = (req, res) =>
+const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .orFail()
-    .then(() => res.send({ message: `Item ${req.params.itemId} liked` }))
+    .then((updatedItem) => {
+      console.log(updatedItem);
+      res.send(updatedItem);
+    })
     .catch((err) => handleErrors(err, res));
+};
 
 const dislikeItem = (req, res) =>
   ClothingItem.findByIdAndUpdate(
@@ -58,7 +62,10 @@ const dislikeItem = (req, res) =>
     { new: true },
   )
     .orFail()
-    .then(() => res.send({ message: `Item ${req.params.itemId} disliked` }))
+    .then((updatedItem) => {
+      console.log(updatedItem);
+      res.send(updatedItem);
+    })
     .catch((err) => handleErrors(err, res));
 
 module.exports = {

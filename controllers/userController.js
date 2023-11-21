@@ -12,7 +12,7 @@ const createUser = async (req, res) => {
     .then((user) => {
       const userObj = user.toObject();
       delete userObj.password;
-      res.send(userObj);
+      res.status(200).send(userObj);
     })
     .catch((err) => {
       if (err.code === 11000) {
