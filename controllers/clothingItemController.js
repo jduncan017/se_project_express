@@ -49,7 +49,6 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((updatedItem) => {
-      console.log(updatedItem);
       res.send(updatedItem);
     })
     .catch((err) => handleErrors(err, res));
@@ -63,7 +62,6 @@ const dislikeItem = (req, res) =>
   )
     .orFail()
     .then((updatedItem) => {
-      console.log(updatedItem);
       res.send(updatedItem);
     })
     .catch((err) => handleErrors(err, res));
