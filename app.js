@@ -10,6 +10,16 @@ const { errors } = require("celebrate");
 const { validateUserInfo, validateAuth } = require("./middlewares/validation");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "http://www.wtwr.blinklab.com",
+    "http://wtwr.blinklab.com",
+    "https://www.wtwr.blinklab.com",
+    "https://wtwr.blinklab.com",
+  ],
+};
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
@@ -20,7 +30,7 @@ mongoose
 
 // app setup
 app.use(express.json());
-app.use(cors({ origin: "http://www.wtwr.blinklab.com" }));
+app.use(cors(corsOptions));
 app.use(rateLimiter);
 app.use(helmet());
 
