@@ -2,6 +2,11 @@
 
 WTWR is a robust back-end server designed to power the "What to Wear?" application. This project emphasizes on building a deeper comprehension of essential back-end concepts including database operations, security implementations, rigorous testing, and efficient deployment strategies.
 
+## Project Preview
+
+[Live Site](https://www.wtwr.blinklab.com)
+[FRONT END REPO](https://github.com/jduncan017/se_project_react)
+
 ## Core Features:
 
 - **API Design:** Well-structured API endpoints to cater to the application's needs.
@@ -14,12 +19,15 @@ WTWR is a robust back-end server designed to power the "What to Wear?" applicati
 - **[MongoDB](https://www.mongodb.com/)**: Scalable and flexible NoSQL database.
 - **[Mongoose](https://mongoosejs.com/)**: MongoDB object modeling for Node.js.
 - **[Postman](https://www.postman.com/)**: Platform for API development.
+- **[Centralized Error Handling](see /middlewares/error-handler)**
 
 ## Node Packages Used
 
 - **[Express-Rate-Limit](https://www.npmjs.com/package/express-rate-limit)**: Rate Limiter
 - **[Validator](https://www.npmjs.com/package/validator)**: Validator for schemas
 - **[Helmet](https://helmetjs.github.io/)**: Express Security Package
+- **[Celebrate](https://www.npmjs.com/package/celebrate)**: joi validation library
+- **[Winton Logger](https://www.npmjs.com/package/winston)**: universal logging library
 
 By working on this project, I've honed my skills in designing efficient back-end architectures and understanding the intricacies of server management and API design.
 
@@ -28,10 +36,6 @@ By working on this project, I've honed my skills in designing efficient back-end
 `npm run start` — to launch the server
 
 `npm run dev` — to launch the server with the hot reload feature
-
-### Testing
-
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
 
 ## Future Updates
 
