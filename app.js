@@ -20,7 +20,7 @@ mongoose
 
 // app setup
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://www.wtwr.blinklab.com" }));
 app.use(rateLimiter);
 app.use(helmet());
 
