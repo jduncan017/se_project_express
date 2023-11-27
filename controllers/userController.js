@@ -2,40 +2,44 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/userModel");
-const { handleErrors } = require("../utils/errors");
+const { ServerError } = require("../middlewares/error-handler/error-handler");
 
-const createUser = async (req, res) => {
-  const { name, avatar, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
+const createUser = async (req, res, next) => {
+  try {
+    const { name, avatar, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const userData = {
-    name,
-    email,
-    password: hashedPassword,
-    avatar: avatar || undefined,
-  };
+    const userData = {
+      name,
+      email,
+      password: hashedPassword,
+      avatar: avatar || undefined,
+    };
 
-  return User.create(userData)
-    .then((user) => {
-      const userObj = user.toObject();
-      delete userObj.password;
-      res.status(200).send(userObj);
-    })
-    .catch((err) => {
-      if (err.code === 11000) {
-        return handleErrors("EMAIL_EXISTS", res);
-      }
-      return handleErrors(err, res);
-    });
+    return User.create(userData)
+      .then((user) => {
+        const userObj = user.toObject();
+        delete userObj.password;
+        res.status(200).send(userObj);
+      })
+      .catch((err) => {
+        if (err.code === 11000) {
+          return next(new ServerError("EMAIL_EXISTS"));
+        }
+        next(err);
+      });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => handleErrors(err, res));
+    .catch((err) => next(err));
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
@@ -43,10 +47,10 @@ const getUser = (req, res) => {
     .then((user) => {
       res.send(user);
     })
-    .catch((err) => handleErrors(err, res));
+    .catch((err) => next(err));
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
@@ -57,24 +61,24 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch(() => {
-      handleErrors("INCORRECT_CREDENTIALS", res);
+      return next(new ServerError("INCORRECT_CREDENTIALS"));
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return handleErrors("USER_NOT_FOUND", res);
+        return next(new ServerError("USER_NOT_FOUND"));
       }
       return res.send(user);
     })
     .catch((err) => {
-      handleErrors(err, res);
+      next(err);
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const userId = req.user._id;
   const { name, avatar, email } = req.body;
 
@@ -85,12 +89,12 @@ const updateProfile = (req, res) => {
   )
     .then((updatedUser) => {
       if (!updatedUser) {
-        return handleErrors("USER_NOT_FOUND", res);
+        return next(new ServerError("USER_NOT_FOUND"));
       }
       return res.send(updatedUser);
     })
     .catch((err) => {
-      handleErrors(err, res);
+      next(err);
     });
 };
 

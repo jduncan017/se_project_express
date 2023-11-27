@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
-const { handleErrors } = require("../utils/errors");
+const { ServerError } = require("./error-handler/error-handler");
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) {
-    return handleErrors("AUTH_HEADER", res);
+    return next(ServerError("AUTH_HEADER"));
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -15,7 +15,7 @@ const auth = (req, res, next) => {
     req.user = payload;
     return next();
   } catch (err) {
-    return handleErrors("INVALID_TOKEN", res);
+    return next(ServerError("INVALID_TOKEN"));
   }
 };
 

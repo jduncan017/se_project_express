@@ -1,7 +1,7 @@
 const ClothingItem = require("../models/clothingItemModel");
-const { handleErrors } = require("../utils/errors");
+const { ServerError } = require("../middlewares/error-handler/error-handler");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -9,16 +9,16 @@ const createItem = (req, res) => {
     .then((item) => {
       res.send(item);
     })
-    .catch((err) => handleErrors(err, res));
+    .catch((err) => next(err));
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
-    .catch((err) => handleErrors(err, res));
+    .catch((err) => next(err));
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -28,20 +28,17 @@ const deleteItem = (req, res) => {
       if (String(item.owner) === String(userId)) {
         return ClothingItem.findByIdAndDelete(itemId);
       }
-      return Promise.reject(new Error("USER_PERMISSION"));
+      throw new ServerError("USER_PERMISSION");
     })
     .then((item) => {
       res.send({ message: "Item Deleted", data: item });
     })
     .catch((err) => {
-      if (err.message === "USER_PERMISSION") {
-        return handleErrors("USER_PERMISSION", res);
-      }
-      return handleErrors(err, res);
+      next(err);
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -51,10 +48,10 @@ const likeItem = (req, res) => {
     .then((updatedItem) => {
       res.send(updatedItem);
     })
-    .catch((err) => handleErrors(err, res));
+    .catch((err) => next(err));
 };
 
-const dislikeItem = (req, res) =>
+const dislikeItem = (req, res, next) =>
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
@@ -64,7 +61,7 @@ const dislikeItem = (req, res) =>
     .then((updatedItem) => {
       res.send(updatedItem);
     })
-    .catch((err) => handleErrors(err, res));
+    .catch((err) => next(err));
 
 module.exports = {
   createItem,

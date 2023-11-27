@@ -1,13 +1,13 @@
 const router = require("express").Router();
 const itemRouter = require("./clothingItemRoutes");
 const userRouter = require("./userRoutes");
-const { handleErrors } = require("../utils/errors");
+const { ServerError } = require("../middlewares/error-handler/error-handler");
 
 router.use("/items", itemRouter);
 router.use("/user", userRouter);
 
-router.use((req, res) => {
-  handleErrors("NOT_FOUND", res);
+router.use((req, res, next) => {
+  next(new ServerError("NOT_FOUND"));
 });
 
 module.exports = router;

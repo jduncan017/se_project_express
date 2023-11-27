@@ -5,6 +5,10 @@ const helmet = require("helmet");
 const routes = require("./routes");
 const { rateLimiter } = require("./utils/rateLimiter");
 const { login, createUser } = require("./controllers/userController");
+const { errorHandler } = require("./middlewares/error-handler/error-handler");
+const { errors } = require("celebrate");
+const { validateUserInfo, validateAuth } = require("./middlewares/validation");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -14,15 +18,24 @@ mongoose
   .then(() => console.log("Database connected"))
   .catch((err) => console.log("Error connecting to database: ", err));
 
+// app setup
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(rateLimiter);
 app.use(helmet());
 
-app.post("/signin", login);
-app.post("/signup", createUser);
+// routing
+app.post("/signup", validateUserInfo, createUser);
+app.post("/signin", validateAuth, login);
+app.use(requestLogger);
 app.use(routes);
 
+// error handling
+app.use(errorLogger);
+app.use(errors());
+app.use(errorHandler);
+
+// port listening
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);
 });
