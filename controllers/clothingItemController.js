@@ -9,7 +9,13 @@ const createItem = (req, res, next) => {
     .then((item) => {
       res.send(item);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        next(new ServerError("BAD_REQUEST"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const getItems = (req, res, next) => {
@@ -23,7 +29,7 @@ const deleteItem = (req, res, next) => {
   const userId = req.user._id;
 
   ClothingItem.findById(itemId)
-    .orFail()
+    .orFail(() => new ServerError("NOT_FOUND"))
     .then((item) => {
       if (String(item.owner) === String(userId)) {
         return ClothingItem.findByIdAndDelete(itemId);
@@ -44,7 +50,7 @@ const likeItem = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail()
+    .orFail(() => new ServerError("NOT_FOUND"))
     .then((updatedItem) => {
       res.send(updatedItem);
     })
@@ -57,7 +63,7 @@ const dislikeItem = (req, res, next) =>
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail()
+    .orFail(() => new ServerError("NOT_FOUND"))
     .then((updatedItem) => {
       res.send(updatedItem);
     })

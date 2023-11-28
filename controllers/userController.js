@@ -26,28 +26,14 @@ const createUser = async (req, res, next) => {
         if (err.code === 11000) {
           return next(new ServerError("EMAIL_EXISTS"));
         }
-        next(err);
+        if (err.name === "ValidationError") {
+          return next(new ServerError("BAD_REQUEST"));
+        }
+        return next(err);
       });
   } catch (err) {
-    next(err);
+    return next(err);
   }
-};
-
-const getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch((err) => next(err));
-};
-
-const getUser = (req, res, next) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
-    .orFail()
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((err) => next(err));
 };
 
 const login = (req, res, next) => {
@@ -55,14 +41,13 @@ const login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
+      console.log(user);
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
       res.send({ token });
     })
-    .catch(() => {
-      return next(new ServerError("INCORRECT_CREDENTIALS"));
-    });
+    .catch(() => next(new ServerError("INCORRECT_CREDENTIALS")));
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -73,9 +58,7 @@ const getCurrentUser = (req, res, next) => {
       }
       return res.send(user);
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 };
 
 const updateProfile = (req, res, next) => {
@@ -94,14 +77,15 @@ const updateProfile = (req, res, next) => {
       return res.send(updatedUser);
     })
     .catch((err) => {
-      next(err);
+      if (err.name === "ValidationError") {
+        return next(new ServerError("BAD_REQUEST"));
+      }
+      return next(err);
     });
 };
 
 module.exports = {
   createUser,
-  getUsers,
-  getUser,
   login,
   getCurrentUser,
   updateProfile,

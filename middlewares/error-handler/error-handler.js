@@ -9,18 +9,15 @@ class ServerError extends Error {
 }
 
 const errorHandler = (err, req, res, next) => {
-  console.error(err);
-
   if (err instanceof ServerError) {
     return res
       .status(err.status)
       .send({ name: err.name, message: err.message });
-  } else {
-    return res.status(500).send({
-      name: "Unknown error",
-      message: "An error occurred on the server.",
-    });
   }
+  return res.status(500).send({
+    name: "Unknown error",
+    message: "An error occurred on the server.",
+  });
 };
 
 module.exports = { ServerError, errorHandler };
