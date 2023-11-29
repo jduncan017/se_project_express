@@ -32,15 +32,15 @@ mongoose
 
 // app setup
 app.use(express.json());
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(rateLimiter);
 app.use(helmet());
 
-// app.get("/crash-test", () => {
-//   setTimeout(() => {
-//     throw new Error("Server will crash now");
-//   }, 0);
-// });
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
 
 // routing
 app.use(requestLogger);
