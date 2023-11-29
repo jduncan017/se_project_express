@@ -1,13 +1,13 @@
 const router = require("express").Router();
 const itemRouter = require("./clothingItemRoutes");
 const userRouter = require("./userRoutes");
-const { ServerError } = require("../middlewares/error-handler/error-handler");
+const { NotFoundError } = require("../middlewares/error-handler/error-handler");
 
 router.use("/items", itemRouter);
 router.use("/users", userRouter);
 
 router.use((req, res, next) => {
-  next(new ServerError("NOT_FOUND"));
+  next(new NotFoundError("Router resource not found."));
 });
 
 module.exports = router;

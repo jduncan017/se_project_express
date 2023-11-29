@@ -2,7 +2,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/userModel");
-const { ServerError } = require("../middlewares/error-handler/error-handler");
+const {
+  ServerError,
+  BadRequestError,
+  NotFoundError,
+} = require("../middlewares/error-handler/error-handler");
 
 const createUser = async (req, res, next) => {
   try {
@@ -24,10 +28,10 @@ const createUser = async (req, res, next) => {
       })
       .catch((err) => {
         if (err.code === 11000) {
-          return next(new ServerError("EMAIL_EXISTS"));
+          return next(new ConflictError("Email already exists."));
         }
         if (err.name === "ValidationError") {
-          return next(new ServerError("BAD_REQUEST"));
+          return next(new BadRequestError());
         }
         return next(err);
       });
@@ -54,7 +58,7 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return next(new ServerError("USER_NOT_FOUND"));
+        return next(new NotFoundError("User not found"));
       }
       return res.send(user);
     })
@@ -72,13 +76,13 @@ const updateProfile = (req, res, next) => {
   )
     .then((updatedUser) => {
       if (!updatedUser) {
-        return next(new ServerError("USER_NOT_FOUND"));
+        return next(new NotFoundError("User not found"));
       }
       return res.send(updatedUser);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return next(new ServerError("BAD_REQUEST"));
+        return next(new BadRequestError());
       }
       return next(err);
     });

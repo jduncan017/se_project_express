@@ -1,6 +1,9 @@
 const { Schema, model } = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const {
+  IncorrectCredentialsError,
+} = require("../middlewares/error-handler/error-handler");
 
 const user = new Schema({
   name: {
@@ -52,12 +55,12 @@ user.statics.findUserByCredentials = function findUserByCredentials(
     .select("+password")
     .then((userProfile) => {
       if (!userProfile) {
-        return Promise.reject(new Error("Incorrect email or password"));
+        return Promise.reject(new IncorrectCredentialsError());
       }
 
       return bcrypt.compare(password, userProfile.password).then((matched) => {
         if (!matched) {
-          return Promise.reject(new Error("Incorrect email or password"));
+          return Promise.reject(new IncorrectCredentialsError());
         }
 
         return userProfile;

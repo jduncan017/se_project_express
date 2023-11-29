@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItemModel");
-const { ServerError } = require("../middlewares/error-handler/error-handler");
+const {
+  ServerError,
+  BadRequestError,
+  NotFoundError,
+  UserPermissionError,
+} = require("../middlewares/error-handler/error-handler");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
@@ -11,7 +16,7 @@ const createItem = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        next(new ServerError("BAD_REQUEST"));
+        next(new BadRequestError());
       } else {
         next(err);
       }
@@ -29,12 +34,12 @@ const deleteItem = (req, res, next) => {
   const userId = req.user._id;
 
   ClothingItem.findById(itemId)
-    .orFail(() => new ServerError("NOT_FOUND"))
+    .orFail(() => new NotFoundErrorError("Item not found."))
     .then((item) => {
       if (String(item.owner) === String(userId)) {
         return ClothingItem.findByIdAndDelete(itemId);
       }
-      throw new ServerError("USER_PERMISSION");
+      throw new UserPermissionError();
     })
     .then((item) => {
       res.send({ message: "Item Deleted", data: item });
@@ -50,7 +55,7 @@ const likeItem = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => new ServerError("NOT_FOUND"))
+    .orFail(() => new NotFoundError("Item not found"))
     .then((updatedItem) => {
       res.send(updatedItem);
     })
@@ -63,7 +68,7 @@ const dislikeItem = (req, res, next) =>
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => new ServerError("NOT_FOUND"))
+    .orFail(() => new NotFoundError("Item not found"))
     .then((updatedItem) => {
       res.send(updatedItem);
     })
