@@ -1,6 +1,5 @@
 const ClothingItem = require("../models/clothingItemModel");
 const {
-  ServerError,
   BadRequestError,
   NotFoundError,
   UserPermissionError,

@@ -7,6 +7,8 @@ const {
   BadRequestError,
   NotFoundError,
 } = require("../middlewares/error-handler/error-handler");
+const NODE_ENV = process.env.NODE_ENV;
+console.log(NODE_ENV);
 
 const createUser = async (req, res, next) => {
   try {
@@ -45,7 +47,6 @@ const login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log(user);
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
