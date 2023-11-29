@@ -1,5 +1,3 @@
-const { JWT_SECRET } = require("../../utils/config");
-
 // Custom Error Classes
 class BadRequestError extends Error {
   constructor(message) {
@@ -30,7 +28,7 @@ class UserPermissionError extends Error {
 
 class NotFoundError extends Error {
   constructor(message) {
-    super(message || "Resource not found.");
+    super(message || "Resource not found!");
     this.status = 404;
     this.name = "NotFoundError";
   }
@@ -55,7 +53,9 @@ class InternalServerError extends Error {
 // Error Handler Middleware
 const errorHandler = (err, req, res, next) => {
   if (err instanceof Error) {
-    return res.status(err.status || 500).send(JWT_SECRET);
+    return res
+      .status(err.status || 500)
+      .send({ name: err.name, message: err.message });
   }
   return res.status(500).send({
     name: "UnknownError",
