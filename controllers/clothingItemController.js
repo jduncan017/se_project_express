@@ -33,7 +33,7 @@ const deleteItem = (req, res, next) => {
   const userId = req.user._id;
 
   ClothingItem.findById(itemId)
-    .orFail(() => new NotFoundErrorError("Item not found."))
+    .orFail(() => new NotFoundError("Item not found."))
     .then((item) => {
       if (String(item.owner) === String(userId)) {
         return ClothingItem.findByIdAndDelete(itemId);

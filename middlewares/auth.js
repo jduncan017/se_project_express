@@ -1,12 +1,14 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
-const { InvalidCredentialsError } = require("./error-handler/error-handler");
+const { IncorrectCredentialsError } = require("./error-handler/error-handler");
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) {
-    return next(InvalidCredentialsError("Authorization token not provided"));
+    return next(
+      new IncorrectCredentialsError("Authorization token not provided"),
+    );
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -15,7 +17,7 @@ const auth = (req, res, next) => {
     req.user = payload;
     return next();
   } catch (err) {
-    return next(InvalidCredentialsError("Invalid token"));
+    return next(new IncorrectCredentialsError("Invalid token"));
   }
 };
 

@@ -6,9 +6,8 @@ const {
   ServerError,
   BadRequestError,
   NotFoundError,
+  ConflictError,
 } = require("../middlewares/error-handler/error-handler");
-const NODE_ENV = process.env.NODE_ENV;
-console.log(NODE_ENV);
 
 const createUser = async (req, res, next) => {
   try {
