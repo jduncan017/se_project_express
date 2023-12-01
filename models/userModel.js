@@ -1,9 +1,7 @@
 const { Schema, model } = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
-const {
-  IncorrectCredentialsError,
-} = require("../middlewares/error-handler/error-handler");
+const { IncorrectCredentialsError } = require("../middlewares/errorHandler");
 
 const user = new Schema({
   name: {

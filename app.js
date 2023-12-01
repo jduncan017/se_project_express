@@ -8,7 +8,7 @@ const { errors } = require("celebrate");
 const routes = require("./routes");
 const { rateLimiter } = require("./utils/rateLimiter");
 const { login, createUser } = require("./controllers/userController");
-const { errorHandler } = require("./middlewares/error-handler/error-handler");
+const errorHandler = require("./middlewares/errorHandler");
 const { validateUserInfo, validateAuth } = require("./middlewares/validation");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 

@@ -2,12 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/userModel");
-const {
-  ServerError,
-  BadRequestError,
-  NotFoundError,
-  ConflictError,
-} = require("../middlewares/error-handler/error-handler");
+const IncorrectCredentialsError = require("../utils/errors/IncorrectCredentialsError");
+const BadRequestError = require("../utils/errors/BadRequestError");
+const NotFoundError = require("../utils/errors/NotFoundError");
+const ConflictError = require("../utils/errors/ConflictError");
 
 const createUser = async (req, res, next) => {
   try {
@@ -51,7 +49,7 @@ const login = (req, res, next) => {
       });
       res.send({ token });
     })
-    .catch(() => next(new ServerError("INCORRECT_CREDENTIALS")));
+    .catch(() => next(new IncorrectCredentialsError()));
 };
 
 const getCurrentUser = (req, res, next) => {
